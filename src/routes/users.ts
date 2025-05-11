@@ -1,26 +1,10 @@
-import {
-    Router,
-    Request,
-    Response,
-    NextFunction
-} from 'express'
+import {Router} from 'express'
+import passport from "passport";
 
-import { models } from '../db'
+import {handleGetAllUsers} from "../controllers/userController";
 
 const router: Router = Router()
 
-const {
-    User
-} = models
+router.get('/', passport.authenticate('jwt', {session: false}), handleGetAllUsers)
 
-export default () => {
-    router.get('/', async (_req: Request, res: Response, _next: NextFunction) => {
-        const users = await User.findAll()
-        return res.json({
-            data: users,
-            message: 'List of users'
-        })
-    })
-
-    return router
-}
+export default router
