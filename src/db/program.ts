@@ -40,7 +40,7 @@ export default (sequelize: Sequelize) => {
 				name: 'programID',
 				allowNull: false
 			},
-			as: 'translations'
+			as: 'exercises'
 		})
 	}
 

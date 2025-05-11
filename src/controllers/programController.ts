@@ -1,5 +1,5 @@
 import {Request, Response} from "express";
-import {getAllPrograms} from "../services/programService";
+import {createProgram, getAllPrograms} from "../services/programService";
 
 export const handleGetAllPrograms = async (req: Request, res: Response) => {
     try {
@@ -16,5 +16,20 @@ export const handleGetAllPrograms = async (req: Request, res: Response) => {
         } else {
             res.status(500).json({ message: 'Internal server error' })
         }
+    }
+}
+
+export const handleCreateProgram = async (req: Request, res: Response) => {
+    try {
+        const { name } = req.body
+        const newProgram = await createProgram(name)
+
+        res.status(201).json({
+            message: 'Program created successfully',
+            data: newProgram
+        })
+    } catch (err: any) {
+        console.error(err)
+        res.status(400).json({ message: err.message || 'Failed to create program' })
     }
 }
