@@ -1,5 +1,6 @@
 import {models} from "../db";
 import {EXERCISE_DIFFICULTY} from "../utils/enums";
+import { Op } from 'sequelize'
 
 const {Exercise, Program} = models
 
@@ -10,6 +11,13 @@ interface UpdateExerciseInput {
         difficulty?: EXERCISE_DIFFICULTY
         programID?: number
     }
+}
+
+interface ExerciseFilterOptions {
+    programID?: number
+    search?: string
+    page: number
+    limit: number
 }
 
 
@@ -94,4 +102,37 @@ export const updateExerciseById = async ({ id, updates }: UpdateExerciseInput) =
     await exercise.update(updates)
 
     return exercise
+}
+
+export const getExercisesFiltered = async ({
+                                               programID,
+                                               search,
+                                               page,
+                                               limit
+                                           }: ExerciseFilterOptions) => {
+    const whereClause: any = {}
+
+    if (programID) {
+        whereClause.programID = programID
+    }
+
+    if (search) {
+        whereClause.name = {
+            [Op.iLike]: `%${search}%`
+        }
+    }
+
+    const offset = (page - 1) * limit
+
+    return models.Exercise.findAll({
+        where: whereClause,
+        offset,
+        limit,
+        include: [{
+            model: models.Program,
+            as: 'program',
+            attributes: ['id', 'name']
+        }],
+        order: [['id', 'ASC']]
+    })
 }

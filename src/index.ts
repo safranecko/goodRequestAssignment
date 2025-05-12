@@ -3,6 +3,7 @@ import express from 'express'
 import * as bodyParser from 'body-parser'
 import passport from './auth/passport-jwt'
 import dotenv from 'dotenv'
+import { languageMiddleware } from './middleware/languageMiddleware'
 
 import { sequelize } from './db'
 import ProgramRouter from './routes/programs'
@@ -13,6 +14,7 @@ import UserExerciseProgressRouter from "./routes/user-exercise-progress"
 
 const app = express()
 
+app.use(languageMiddleware)
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(bodyParser.json())
 app.use('/programs', ProgramRouter)
@@ -21,6 +23,7 @@ app.use('/users', UserRouter)
 app.use('/auth', AuthRouter)
 app.use('/user-exercise-progress', UserExerciseProgressRouter)
 app.use(passport.initialize())
+
 
 dotenv.config()
 

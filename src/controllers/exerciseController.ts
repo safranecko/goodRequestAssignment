@@ -2,21 +2,25 @@ import {Request, Response} from "express";
 import {
     createExercise,
     deleteExerciseById,
-    getAllExercises,
-    getExercisesByProgramId, updateExerciseById
+    getExercisesFiltered,
+    updateExerciseById
 } from "../services/exerciseService";
-import {models} from "../db";
-const {
-    Program
-} = models
+import {getMessage} from "../services/localizationService";
 
-export const handleGetAllExercises = async (req: Request, res: Response) => {
+export const handleGetExercises = async (req: Request, res: Response) => {
     try {
-        const programs = await getAllExercises()
+        const { programID, search, page = '1', limit = '10' } = req.query
+
+        const exercises = await getExercisesFiltered({
+            programID: programID ? Number(programID) : undefined,
+            search: search as string,
+            page: Number(page),
+            limit: Number(limit)
+        })
 
         res.status(201).json({
-            message: 'List of exercises retrieved successfully',
-            ...programs
+            message: getMessage('exerciseListSuccess', req.language),
+            ...exercises
         })
     } catch (err: any) {
         console.error(err)
@@ -34,32 +38,12 @@ export const handleCreateExercise = async (req: Request, res: Response) => {
         const exercise = await createExercise({ name, difficulty, programID })
 
         res.status(201).json({
-            message: 'Exercise created successfully',
+            message: getMessage('exerciseCreated', req.language),
             data: exercise
         })
     } catch (err: any) {
         console.error(err)
-        res.status(400).json({ message: err.message || 'Failed to create exercise' })
-    }
-}
-
-export const handleGetExercisesByProgram = async (req: Request, res: Response) => {
-    try {
-        const programID = parseInt(req.params.programID)
-        const programExists = await Program.findByPk(programID)
-
-        if (isNaN(programID) || !programExists) {
-            return res.status(400).json({ message: 'Invalid program ID' })
-        }
-        const exercises = await getExercisesByProgramId(programID)
-
-        res.status(200).json({
-            message: 'Exercises retrieved successfully',
-            data: exercises
-        })
-    } catch (err: any) {
-        console.error(err)
-        res.status(500).json({ message: 'Failed to retrieve exercises' })
+        res.status(400).json({ message: err.message || getMessage('exerciseCreatedFailed', req.language)})
     }
 }
 
@@ -68,7 +52,8 @@ export const handleDeleteExercise = async (req: Request, res: Response) => {
         const id = parseInt(req.params.id)
 
         if (isNaN(id)) {
-            return res.status(400).json({ message: 'Invalid exercise ID' })
+            return res.status(400).json({
+                message: getMessage('invalidExerciseID', req.language), })
         }
 
         const result = await deleteExerciseById(id)
@@ -79,7 +64,7 @@ export const handleDeleteExercise = async (req: Request, res: Response) => {
         if (err.message === 'Exercise not found') {
             res.status(404).json({ message: err.message })
         } else {
-            res.status(500).json({ message: 'Failed to delete exercise' })
+            res.status(500).json({ message: getMessage('exerciseDeletedFailed', req.language)})
         }
     }
 }
@@ -88,7 +73,7 @@ export const handleUpdateExercise = async (req: Request, res: Response) => {
     try {
         const id = parseInt(req.params.id)
         if (isNaN(id)) {
-            return res.status(400).json({ message: 'Invalid exercise ID' })
+            return res.status(400).json({ message: getMessage('invalidExerciseID', req.language)})
         }
 
         const updatedExercise = await updateExerciseById({
@@ -97,7 +82,7 @@ export const handleUpdateExercise = async (req: Request, res: Response) => {
         })
 
         res.status(200).json({
-            message: 'Exercise updated successfully',
+            message: getMessage('exerciseUpdated', req.language),
             data: updatedExercise
         })
     } catch (err: any) {
@@ -107,7 +92,7 @@ export const handleUpdateExercise = async (req: Request, res: Response) => {
         ) {
             res.status(400).json({ message: err.message })
         } else {
-            res.status(500).json({ message: 'Failed to update exercise' })
+            res.status(500).json({ message: getMessage('exerciseUpdatedFailed', req.language)})
         }
     }
 }

@@ -2,6 +2,7 @@ import {Request, Response} from "express";
 import {getAllUsers, getUserById, updateUserById} from "../services/userService";
 import {USER_ROLE} from "../utils/enums";
 import {getUserProgress} from "../services/userExerciseProgressService";
+import {getMessage} from "../services/localizationService";
 
 export const handleGetAllUsers = async (req: Request, res: Response) => {
     try {
@@ -20,7 +21,7 @@ export const handleGetAllUsers = async (req: Request, res: Response) => {
         })
 
         res.status(201).json({
-            message: 'Users list retrieved successfully',
+            message: getMessage('usersListSuccess', req.language),
             ...filteredUsers
         })
     } catch (err: any) {
@@ -38,13 +39,13 @@ export const handleGetUserById = async (req: Request, res: Response) => {
         const id = parseInt(req.params.id)
 
         if (isNaN(id)) {
-            return res.status(400).json({ message: 'Invalid user ID' })
+            return res.status(400).json({ message: getMessage('invalidUserID', req.language)})
         }
 
         const user = await getUserById(id)
 
         res.status(200).json({
-            message: 'User details retrieved successfully',
+            message: getMessage('userDetails', req.language),
             data: user
         })
     } catch (err: any) {
@@ -52,7 +53,7 @@ export const handleGetUserById = async (req: Request, res: Response) => {
         if (err.message === 'User not found') {
             res.status(404).json({ message: err.message })
         } else {
-            res.status(500).json({ message: 'Failed to retrieve user details' })
+            res.status(500).json({ message: getMessage('userDetailsFailed', req.language)})
         }
     }
 }
@@ -64,7 +65,7 @@ export const handleGetMyProfile = async (req: Request, res: Response) => {
         const userProgress = await getUserProgress(requester.id)
 
         res.status(200).json({
-            message: 'User data and progress retrieved successfully. Profile loaded correctly',
+            message: getMessage('userProfile', req.language),
             data: {
                 user,
                 progress: userProgress
@@ -75,7 +76,7 @@ export const handleGetMyProfile = async (req: Request, res: Response) => {
         if (err.message === 'User not found') {
             res.status(404).json({ message: err.message })
         } else {
-            res.status(500).json({ message: 'Failed to retrieve user profile or progress' })
+            res.status(500).json({ message: getMessage('userProfileFailed', req.language)})
         }
     }
 }
@@ -84,7 +85,7 @@ export const handleUpdateUser = async (req: Request, res: Response) => {
     try {
         const id = parseInt(req.params.id)
         if (isNaN(id)) {
-            return res.status(400).json({ message: 'Invalid user ID' })
+            return res.status(400).json({ message: getMessage('invalidUserID', req.language)})
         }
 
         const updatedUser = await updateUserById({
@@ -93,7 +94,7 @@ export const handleUpdateUser = async (req: Request, res: Response) => {
         })
 
         res.status(200).json({
-            message: 'User updated successfully',
+            message: getMessage('userUpdated', req.language),
             data: updatedUser
         })
     } catch (err: any) {
@@ -101,7 +102,7 @@ export const handleUpdateUser = async (req: Request, res: Response) => {
         if (err.message === 'User not found' || err.message === 'Invalid role') {
             res.status(400).json({ message: err.message })
         } else {
-            res.status(500).json({ message: 'Failed to update user' })
+            res.status(500).json({ message: getMessage('userUpdatedFailed', req.language)})
         }
     }
 }
