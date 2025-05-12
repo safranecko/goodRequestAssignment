@@ -5,6 +5,16 @@ import {USER_ROLE} from '../utils/enums'
 
 const {User} = models
 
+interface RegisterUserParams {
+    name: string
+    surname: string
+    nickName?: string
+    email: string
+    age: number
+    password: string
+    role?: USER_ROLE
+}
+
 export const registerUser = async ({
                                        name,
                                        surname,
@@ -13,15 +23,7 @@ export const registerUser = async ({
                                        age,
                                        password,
                                        role
-                                   }: {
-    name: string
-    surname: string
-    nickName?: string
-    email: string
-    age: number
-    password: string
-    role?: USER_ROLE
-}) => {
+                                   }: RegisterUserParams) => {
     const existingUser = await User.findOne({where: {email}})
     if (existingUser) {
         throw new Error('User already exists')
