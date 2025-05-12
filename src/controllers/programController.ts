@@ -1,12 +1,13 @@
 import {Request, Response} from "express";
 import {createProgram, getAllPrograms} from "../services/programService";
+import {getMessage} from "../services/localizationService";
 
 export const handleGetAllPrograms = async (req: Request, res: Response) => {
     try {
         const programs = await getAllPrograms()
 
         res.status(201).json({
-            message: 'List of programs retrieved successfully',
+            message: getMessage('programListSuccess', req.language),
             ...programs
         })
     } catch (err: any) {
@@ -25,11 +26,11 @@ export const handleCreateProgram = async (req: Request, res: Response) => {
         const newProgram = await createProgram(name)
 
         res.status(201).json({
-            message: 'Program created successfully',
+            message: getMessage('programCreated', req.language),
             data: newProgram
         })
     } catch (err: any) {
         console.error(err)
-        res.status(400).json({ message: err.message || 'Failed to create program' })
+        res.status(400).json({ message: err.message || getMessage('programCreatedFailed', req.language)})
     }
 }
