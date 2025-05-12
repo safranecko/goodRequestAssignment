@@ -12,7 +12,7 @@ import {USER_ROLE} from "../utils/enums";
 const router: Router = Router()
 
 router.get('/', handleGetAllExercises)
-router.get('/byProgram/:programID', handleGetExercisesByProgram)
+router.get('/by-program/:programID', handleGetExercisesByProgram)
 router.post(
     '/create',
     passport.authenticate('jwt', {session: false}),

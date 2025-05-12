@@ -7,6 +7,7 @@ import { Sequelize } from 'sequelize'
 import defineExercise from './exercise'
 import defineProgram from './program'
 import defineUser from './user'
+import defineUserExerciseProgress from './userExerciseProgress'
 
 const sequelize: Sequelize = new Sequelize('postgresql://localhost:5432/fitness_app', {
 	logging: false
@@ -19,6 +20,8 @@ const modelsBuilder = (instance: Sequelize) => ({
 	Exercise: instance.import(path.join(__dirname, 'exercise'), defineExercise),
 	Program: instance.import(path.join(__dirname, 'program'), defineProgram),
 	User: instance.import(path.join(__dirname, 'user'), defineUser),
+	UserExerciseProgress: instance.import(path.join(__dirname, 'userExerciseProgress'), defineUserExerciseProgress),
+
 
 })
 

@@ -1,6 +1,7 @@
 import {Request, Response} from "express";
 import {getAllUsers, getUserById, updateUserById} from "../services/userService";
 import {USER_ROLE} from "../utils/enums";
+import {getUserProgress} from "../services/userExerciseProgressService";
 
 export const handleGetAllUsers = async (req: Request, res: Response) => {
     try {
@@ -52,6 +53,29 @@ export const handleGetUserById = async (req: Request, res: Response) => {
             res.status(404).json({ message: err.message })
         } else {
             res.status(500).json({ message: 'Failed to retrieve user details' })
+        }
+    }
+}
+
+export const handleGetMyProfile = async (req: Request, res: Response) => {
+    try {
+        const requester = req.user as { id: number}
+        const user = await getUserById(requester.id)
+        const userProgress = await getUserProgress(requester.id)
+
+        res.status(200).json({
+            message: 'User data and progress retrieved successfully. Profile loaded correctly',
+            data: {
+                user,
+                progress: userProgress
+            }
+        })
+    } catch (err: any) {
+        console.error(err)
+        if (err.message === 'User not found') {
+            res.status(404).json({ message: err.message })
+        } else {
+            res.status(500).json({ message: 'Failed to retrieve user profile or progress' })
         }
     }
 }
