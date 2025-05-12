@@ -13,6 +13,7 @@ import AuthRouter from "./routes/auth"
 import UserExerciseProgressRouter from "./routes/user-exercise-progress"
 
 const app = express()
+dotenv.config()
 
 app.use(languageMiddleware)
 app.use(bodyParser.urlencoded({ extended: true }))
@@ -23,10 +24,6 @@ app.use('/users', UserRouter)
 app.use('/auth', AuthRouter)
 app.use('/user-exercise-progress', UserExerciseProgressRouter)
 app.use(passport.initialize())
-
-
-dotenv.config()
-
 
 const httpServer = http.createServer(app)
 
