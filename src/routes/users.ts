@@ -1,34 +1,37 @@
 import {Router} from 'express'
-import {
-    handleCreateExercise, handleDeleteExercise,
-    handleGetAllExercises,
-    handleGetExercisesByProgram, handleUpdateExercise
-} from "../controllers/exerciseController";
 import passport from "passport";
+
+import {
+    handleGetAllUsers,
+    handleGetMyProfile,
+    handleGetUserById,
+    handleUpdateUser
+} from "../controllers/userController";
 import {requireRole} from "../middleware/requireRole";
 import {USER_ROLE} from "../utils/enums";
 
-
 const router: Router = Router()
 
-router.get('/', handleGetAllExercises)
-router.get('/by-program/:programID', handleGetExercisesByProgram)
-router.post(
-    '/create',
+router.get(
+    '/',
     passport.authenticate('jwt', {session: false}),
-    requireRole(USER_ROLE.ADMIN),
-    handleCreateExercise)
-router.delete(
+    handleGetAllUsers)
+router.get(
+    '/my-profile/',
+    passport.authenticate('jwt', { session: false }),
+    handleGetMyProfile
+)
+router.get(
     '/:id',
     passport.authenticate('jwt', { session: false }),
     requireRole(USER_ROLE.ADMIN),
-    handleDeleteExercise
+    handleGetUserById
 )
 router.put(
     '/:id',
     passport.authenticate('jwt', { session: false }),
     requireRole(USER_ROLE.ADMIN),
-    handleUpdateExercise
+    handleUpdateUser
 )
 
 export default router

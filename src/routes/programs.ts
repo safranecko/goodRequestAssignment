@@ -1,26 +1,13 @@
-import {
-	Router,
-	Request,
-	Response,
-	NextFunction
-} from 'express'
+import {Router} from 'express'
+import {handleCreateProgram, handleGetAllPrograms} from "../controllers/programController";
+import passport from "passport";
+import {requireRole} from "../middleware/requireRole";
+import {USER_ROLE} from "../utils/enums";
 
-import { models } from '../db'
 
 const router: Router = Router()
 
-const {
-	Program
-} = models
+router.get('/', handleGetAllPrograms)
+router.post('/create', passport.authenticate('jwt', {session: false}), requireRole(USER_ROLE.ADMIN), handleCreateProgram)
 
-export default () => {
-	router.get('/', async (_req: Request, res: Response, _next: NextFunction) => {
-		const programs = await Program.findAll()
-		return res.json({
-			data: programs,
-			message: 'List of programs'
-		})
-	})
-
-	return router
-}
+export default router

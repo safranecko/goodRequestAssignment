@@ -3,7 +3,6 @@
 import {
 	Sequelize,
 	DataTypes,
-	Model
 } from 'sequelize'
 import { DatabaseModel } from '../types/db'
 import { ProgramModel } from './program'
@@ -45,6 +44,7 @@ export default (sequelize: Sequelize) => {
 				name: 'programID',
 				allowNull: false
 			},
+			as: 'program'
 		})
 	}
 
