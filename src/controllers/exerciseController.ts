@@ -2,21 +2,24 @@ import {Request, Response} from "express";
 import {
     createExercise,
     deleteExerciseById,
-    getAllExercises,
-    getExercisesByProgramId, updateExerciseById
+    getExercisesFiltered,
+    updateExerciseById
 } from "../services/exerciseService";
-import {models} from "../db";
-const {
-    Program
-} = models
 
-export const handleGetAllExercises = async (req: Request, res: Response) => {
+export const handleGetExercises = async (req: Request, res: Response) => {
     try {
-        const programs = await getAllExercises()
+        const { programID, search, page = '1', limit = '10' } = req.query
+
+        const exercises = await getExercisesFiltered({
+            programID: programID ? Number(programID) : undefined,
+            search: search as string,
+            page: Number(page),
+            limit: Number(limit)
+        })
 
         res.status(201).json({
             message: 'List of exercises retrieved successfully',
-            ...programs
+            ...exercises
         })
     } catch (err: any) {
         console.error(err)
@@ -40,26 +43,6 @@ export const handleCreateExercise = async (req: Request, res: Response) => {
     } catch (err: any) {
         console.error(err)
         res.status(400).json({ message: err.message || 'Failed to create exercise' })
-    }
-}
-
-export const handleGetExercisesByProgram = async (req: Request, res: Response) => {
-    try {
-        const programID = parseInt(req.params.programID)
-        const programExists = await Program.findByPk(programID)
-
-        if (isNaN(programID) || !programExists) {
-            return res.status(400).json({ message: 'Invalid program ID' })
-        }
-        const exercises = await getExercisesByProgramId(programID)
-
-        res.status(200).json({
-            message: 'Exercises retrieved successfully',
-            data: exercises
-        })
-    } catch (err: any) {
-        console.error(err)
-        res.status(500).json({ message: 'Failed to retrieve exercises' })
     }
 }
 
