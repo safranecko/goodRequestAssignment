@@ -7,11 +7,15 @@ import {
 import passport from "passport";
 import {requireRole} from "../middleware/requireRole";
 import {USER_ROLE} from "../utils/enums";
+import {validateExerciseQuery} from "../middleware/validateExerciseQueries";
 
 
 const router: Router = Router()
 
-router.get('/', handleGetExercises)
+router.get(
+    '/',
+    validateExerciseQuery,
+    handleGetExercises)
 router.post(
     '/create',
     passport.authenticate('jwt', {session: false}),
@@ -19,13 +23,13 @@ router.post(
     handleCreateExercise)
 router.delete(
     '/:id',
-    passport.authenticate('jwt', { session: false }),
+    passport.authenticate('jwt', {session: false}),
     requireRole(USER_ROLE.ADMIN),
     handleDeleteExercise
 )
 router.put(
     '/:id',
-    passport.authenticate('jwt', { session: false }),
+    passport.authenticate('jwt', {session: false}),
     requireRole(USER_ROLE.ADMIN),
     handleUpdateExercise
 )
